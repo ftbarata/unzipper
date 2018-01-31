@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import UsersForPath, Paths
 
-# Register your models here.
+admin.site.register(UsersForPath)
+admin.site.register(Paths)
