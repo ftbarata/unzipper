@@ -1,0 +1,33 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+
+<div id="page-wrapper">
+    <div class="panel-body">
+        <div class="row">
+            <h3 class="text-primary">Descompactar arquivo</h3>
+        </div>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <label>Digite o caminho de destino para a descompactação</label>
+            <br/>
+            <input  placeholder="Caminho destino" id="path" size="200">
+            <i class="fa fa-check fa-3x" id="checked"></i>
+            <i class="fa fa-times fa-3x " id="times"></i>
+        </div>
+        <br/>
+        <div class="row">
+            <form enctype="multipart/form-data" method="post" id="uploadform">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>Selecione um arquivo ZIP ou RAR</label>
+                    <input type="file" name="file">
+                </div>
+                <button type="submit" id="btn-submit" class="btn btn-primary" form="uploadform">Enviar</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
