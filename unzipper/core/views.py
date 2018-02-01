@@ -89,6 +89,7 @@ def login(request):
                     return render(request, 'core/home.html', {'partidas':partidas})
                 else:
                     return render(request, 'core/home.html', {'msg': 'Nenhum ponto de partida autorizado.'})
+            return render(request, 'core/home.html', {'msg': 'Nenhum ponto de partida autorizado.'})
         else:
             context = {'error_message': 'Acesso negado. Verifique seu login e senha.'}
             return render(request, 'core/login.html', context)
