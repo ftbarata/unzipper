@@ -30,3 +30,12 @@ def checkPath(username,path):
         return False
     else:
         return False
+
+
+def checkPartidas(request):
+    if UsersForPath.objects.filter(username=request.user).exists():
+        partidas = Paths.objects.filter(username=UsersForPath.objects.get(username=request.user))
+        if partidas:
+            return partidas
+        else:
+            return False
