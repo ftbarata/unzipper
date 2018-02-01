@@ -3,7 +3,7 @@ from django.db import models
 
 class UsersForPath(models.Model):
     username = models.CharField(verbose_name='Usuário', max_length=100)
-    path = models.ManyToManyField('Paths')
+
     class Meta:
         verbose_name = 'Usuários para caminhos'
         verbose_name_plural = 'Usuários para caminhos'
