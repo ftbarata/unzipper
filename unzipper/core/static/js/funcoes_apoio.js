@@ -6,10 +6,11 @@ $( document ).ready(function() {
        source: function( request, response ) {
         $.ajax({
           crossDomain: true,
-          url: "http://localhost:8000/ajax/" + $("#path").val(),
+          type: "POST",
+          url: "http://localhost:8000/ajax/checkpath",
           dataType: "json",
           data: {
-
+            inputpath:$("#path").val()
           },
           success: function( data ) {
 
@@ -26,4 +27,5 @@ $( document ).ready(function() {
       },
       minLength: 2,
     })
+
 });

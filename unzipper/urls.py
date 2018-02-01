@@ -25,7 +25,7 @@ urlpatterns = [
     path('', home, name='home'),
     path('login/', login, name='login'),
     path('logout/', logout, name='logout'),
-    path('ajax/<str:path>', checkPathView, name='ajax'),
+    path('ajax/checkpath', checkPathView, name='ajax'),
 ]
 
 

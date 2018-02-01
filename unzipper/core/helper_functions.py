@@ -1,5 +1,4 @@
 from django.contrib.auth import authenticate, login, logout
-import os
 from .models import Paths, UsersForPath
 
 def _login(request):
@@ -23,13 +22,11 @@ def _logout(request):
 
 
 def checkPath(username,path):
-    if UsersForPath.objects.all().filter(username=username).exists():
-        queryset = Paths.objects.get(username=UsersForPath.objects.get(username=username))
+    if UsersForPath.objects.filter(username=username).exists():
+        queryset = Paths.objects.filter(username=UsersForPath.objects.get(username=username))
         for i in queryset:
-            if os.path.join(i.startpointpath, path):
+            if i.startpointpath == path:
                 return True
         return False
     else:
         return False
-
-
