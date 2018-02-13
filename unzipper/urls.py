@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from .core.views import home, login, logout, checkPathView
+from .core.views import home, login, logout, checkPathView, emails
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -23,6 +23,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home, name='home'),
+    path('emails/', emails, name='emails'),
     path('login/', login, name='login'),
     path('logout/', logout, name='logout'),
     path('ajax/checkpath', checkPathView, name='ajax'),

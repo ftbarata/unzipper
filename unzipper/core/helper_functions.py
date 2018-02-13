@@ -44,15 +44,20 @@ def checkPartidas(request):
 
 
 def zimbraQuotaUsage(domain):
-    # result = subprocess.run(['ssh', '-C', 'root@mx','/root/fellipe_zimbra.sh', 'quota_usage', '{}'.format(domain)], stdout=subprocess.PIPE)
-    result = subprocess.run(['/root/fellipe_zimbra.sh', 'quota_usage', '{}'.format(domain)],stdout=subprocess.PIPE)
+    result = subprocess.run(['ssh', '-C', 'root@mx.manancialturismo.com.br','cat /root/fellipe_zimbra_quota_usage.txt'], stdout=subprocess.PIPE)
     response = result.stdout.decode('utf-8').splitlines()
     tuples_list = []
+    updated_at = ''
     for line in response:
+        print(line)
         if 'Conta' not in line and 'Cota_Total' not in line:
-            if 'admin@' not in line.split()[0].lower():
-                if len(line.split() ) == 5:
-                    tuples_list.append((line.split()[0], line.split()[1] + ' ' + line.split()[2], line.split()[3] + ' ' + line.split()[4]))
-                elif len(line.split()) == 3:
-                    tuples_list.append((line.split()[0], line.split()[1] + ' ' + line.split()[2]))
-    return sorted(tuples_list, key=lambda tup: tup[0])
+            if '/' in line:
+                updated_at = line
+            else:
+                if domain.lower() in line.lower():
+                    if 'admin@' not in line.split()[0].lower():
+                        if len(line.split()) == 5:
+                            tuples_list.append((line.split()[0], line.split()[1] + ' ' + line.split()[2], line.split()[3] + ' ' + line.split()[4]))
+                        elif len(line.split()) == 3:
+                            tuples_list.append((line.split()[0], line.split()[1] + ' ' + line.split()[2]))
+    return (sorted(tuples_list, key=lambda tup: tup[0]), updated_at)

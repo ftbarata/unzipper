@@ -108,18 +108,17 @@ def checkPathView(request):
 
 
 def emails(request):
-    if os.path.isfile('/root/fellipe_zimbra.sh'):
-        if UsersForPath.objects.filter(username=request.user).exists():
-            if RegisteredMailDomains.objects.all().filter(username=UsersForPath.objects.get(username=request.user)).exists():
-                registered_mail_domains = RegisteredMailDomains.objects.all().filter(username=UsersForPath.objects.get(username=request.user))
-                mails = []
-                for i in registered_mail_domains:
-                    domain_mails_tuple_list = (i.domain, zimbraQuotaUsage(i.domain))
-                    mails.append(domain_mails_tuple_list)
-                return render(request, 'core/emails.html', {'mails': mails})
-            else:
-                return render(request, 'core/emails.html')
+    if UsersForPath.objects.filter(username=request.user).exists():
+        if RegisteredMailDomains.objects.all().filter(username=UsersForPath.objects.get(username=request.user)).exists():
+            registered_mail_domains = RegisteredMailDomains.objects.all().filter(username=UsersForPath.objects.get(username=request.user))
+            mails = []
+            updated_at = ''
+            for i in registered_mail_domains:
+                domain_mails_tuple_list = (i.domain, zimbraQuotaUsage(i.domain)[0])
+                mails.append(domain_mails_tuple_list)
+                updated_at = zimbraQuotaUsage(i.domain)[1]
+            return render(request, 'core/emails.html', {'mails': mails, 'updated_at': updated_at})
         else:
             return render(request, 'core/emails.html')
     else:
-        return render(request, 'core/emails.html', {'alert_message': 'Bash script de acesso ao zimbra não foi encontrado.'})
+        return render(request, 'core/emails.html')
