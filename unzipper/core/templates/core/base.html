@@ -12,6 +12,8 @@
 
     <title>Unzipper</title>
 
+    <link rel="shortcut icon" href="{%  static 'images/favicon.ico' %}">
+
     <!-- Bootstrap Core CSS -->
     <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
 
@@ -24,9 +26,6 @@
     <!-- Morris Charts CSS -->
     <link href="{% static 'vendor/morrisjs/morris.css' %}" rel="stylesheet">
 
-    <!--Fellipe CSS-->
-    <!--<link href="{% static 'css/fellipe.css' %}" rel="stylesheet">-->
-
     <!-- Custom Fonts -->
     <link href="{% static 'vendor/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css">
 
@@ -36,7 +35,6 @@
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
-
 </head>
 
 <body>
@@ -89,6 +87,7 @@
                     <ul class="nav" id="side-menu">
                         <li>
                             <a href="{% url 'home' %}"><i class="fa fa-home fa-fw"></i>Home</a>
+                            <a href="{% url 'emails' %}" id="emails_hyperlink"> <i class="fa fa-home fa-fw"></i>Emails</a>
                         </li>
                     </ul>
                 </div>

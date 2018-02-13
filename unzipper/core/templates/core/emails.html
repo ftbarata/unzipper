@@ -1,0 +1,76 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block content %}
+
+{% if alert_message %}
+<div class="alert alert-danger">
+    {{alert_message}}
+</div>
+{% endif %}
+
+<div class="row" id="progress">
+    <img src="{% static 'images/carregando.gif' %}" align="center" style="width: 180px; height: auto; position: absolute; top: 11%; left: 50%; z-index: 99999999999;">
+    <h3 class="text-danger" align="center" style="height: auto; position: absolute; top: 5%; left: 30%; z-index: 999999999999;"><strong>Atenção, esta é uma operação pesada e pode demorar alguns minutos.</strong></h3>
+</div>
+    <div id="wrapper">
+        <div id="page-wrapper">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="page-header">E-mails</h1>
+                </div>
+            </div>
+            <div class="row">
+                <h4 class="text-warning">Informação: A conta "admin@dominio" não está sendo exibida pois normalmente é uma conta para uso interno/administrativo.</h4>
+            </div>
+            <!-- /.row -->
+            {% if mails %}
+                {% for i in mails %}
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    Domínio: <strong>{{i.0|upper}}</strong>
+                                </div>
+                                <!-- /.panel-heading -->
+                                <div class="panel-body">
+                                    <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                                        <thead>
+                                            <tr>
+                                                <th>Conta</th>
+                                                <th>Cota Total</th>
+                                                <th>Cota Utilizada</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for j in i.1 %}
+                                            <tr class="info">
+                                                {% if j.2 %}
+                                                    <td class="center">{{j.0}}</td>
+                                                    <td class="center">{{j.1}}</td>
+                                                    <td class="center">{{j.2}}</td>
+                                                {% else %}
+                                                    <td class="center">{{j.0}}</td>
+                                                    <td class="center">Ilimitado</td>
+                                                    <td class="center">{{j.1}}</td>
+                                                {% endif %}
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                    <!-- /.table-responsive -->
+                                </div>
+                                <!-- /.panel-body -->
+                            </div>
+                            <!-- /.panel -->
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-warning">
+                    Não há e-mails associados ao seu usuário.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% endblock %}

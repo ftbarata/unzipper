@@ -1,5 +1,5 @@
 {% extends 'core/base.html' %}
-
+{% load static %}
 {% block content %}
 
 <div id="page-wrapper">
@@ -7,6 +7,10 @@
         <div class="row">
             <h3 class="text-primary">Descompactar arquivo</h3>
         </div>
+    </div>
+    <div class="row" id="progress">
+        <img src="{% static 'images/carregando.gif' %}" align="center" style="width: 180px; height: auto; position: absolute; top: 11%; left: 50%; z-index: 99999999999;">
+        <h3 class="text-danger" align="center" style="height: auto; position: absolute; top: 5%; left: 30%; z-index: 999999999999;"><strong>Atenção, esta é uma operação pesada e pode demorar alguns minutos.</strong></h3>
     </div>
     <form  enctype="multipart/form-data" method="post" id="uploadform" action="{% url 'home' %}">
         {% csrf_token %}
@@ -19,16 +23,23 @@
                 <i class="fa fa-times fa-3x " id="times"></i>
             </div>
                 <br/>
-            <div id="progressbar">
-                <div class="progress-label">Carregando...</div>
-            </div>
-
             <div class="row">
                 <label>Complemento do caminho</label>
                 <br/>
-                <input name="pathnameleft" placeholder="Complemento do caminho (Opcional)" id="pathleft" style="width:80%">
+                <input name="pathnameleft" placeholder="Complemento do caminho" id="pathleft" style="width:80%" required>
             </div>
-            <br/>
+                <div class="row">
+                    <label>Selects</label>
+                    <br/>
+                    <select>
+                        <option>1 ( Comentário grandeeeeeeeeeeeeeeeeeeeeeee)</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                    </select>
+                </div>
+
             <div class="row">
                 <div class="form-group">
                     <label>Selecione um arquivo ZIP ou RAR</label>

@@ -1,5 +1,7 @@
 from django.contrib.auth import authenticate, login, logout
 from .models import Paths, UsersForPath
+import subprocess
+
 
 def _login(request):
     if request.method == 'POST':
@@ -39,3 +41,18 @@ def checkPartidas(request):
             return partidas
         else:
             return False
+
+
+def zimbraQuotaUsage(domain):
+    # result = subprocess.run(['ssh', '-C', 'root@mx','/root/fellipe_zimbra.sh', 'quota_usage', '{}'.format(domain)], stdout=subprocess.PIPE)
+    result = subprocess.run(['/root/fellipe_zimbra.sh', 'quota_usage', '{}'.format(domain)],stdout=subprocess.PIPE)
+    response = result.stdout.decode('utf-8').splitlines()
+    tuples_list = []
+    for line in response:
+        if 'Conta' not in line and 'Cota_Total' not in line:
+            if 'admin@' not in line.split()[0].lower():
+                if len(line.split() ) == 5:
+                    tuples_list.append((line.split()[0], line.split()[1] + ' ' + line.split()[2], line.split()[3] + ' ' + line.split()[4]))
+                elif len(line.split()) == 3:
+                    tuples_list.append((line.split()[0], line.split()[1] + ' ' + line.split()[2]))
+    return sorted(tuples_list, key=lambda tup: tup[0])

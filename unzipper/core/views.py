@@ -2,10 +2,11 @@ from django.shortcuts import render, redirect
 from .helper_functions import _login, _logout
 from django.core.files.storage import FileSystemStorage
 import rarfile, zipfile,os
-from .helper_functions import checkPath, checkPartidas
+from .helper_functions import checkPath, checkPartidas, zimbraQuotaUsage
 from django.views.decorators.csrf import csrf_exempt
-from .models import Paths, UsersForPath
+from .models import Paths, UsersForPath, RegisteredMailDomains
 from django.conf import settings
+import os
 
 
 def home(request):
@@ -37,43 +38,35 @@ def home(request):
                     return render(request, 'core/home.html',{'error_message': 'Arquivo não é zip nem rar.', 'msg': msg, 'partidas': msg})
                 else:
                     startpoint = request.POST['pathname']
+
                     abs_path_to_uploaded_file = os.path.join(fs.location, filename)
+
                     if 'pathnameleft' in request.POST:
                         pathleft = request.POST['pathnameleft']
-                        if not os.path.isdir(os.path.join(startpoint,pathleft)):
-                            return render(request, 'core/home.html', {'error_message': 'O caminho informado não existe.', 'msg': msg, 'partidas': msg})
-                        else:
-                            os.system('cp -f {} {}'.format(abs_path_to_uploaded_file, os.path.join(startpoint, pathleft)))
-                            os.chdir(os.path.join(startpoint, pathleft))
-                            if rarfile.is_rarfile(file):
-                                os.system('unrar x -o+ {}'.format(filename))
-                            elif zipfile.is_zipfile(file):
-                                os.system('unzip -o {}'.format(filename))
-                            os.system('rm -f {}'.format(filename))
-                            os.system('chown -R ftpconntrack:daemon *')
-                            os.system('find . -type f -exec chmod 640 {} \;')
-                            os.system('find . -type d -exec chmod 750 {} \;')
-                            os.remove(abs_path_to_uploaded_file)
-
-                        return render(request, 'core/home.html',{'status_message': 'Descompactação executada com sucesso', 'msg': msg, 'partidas': msg})
-
                     else:
-                        if not os.path.isdir(startpoint):
-                            return render(request, 'core/home.html', {'error_message': 'O caminho informado não existe.', 'msg': msg, 'partidas': msg})
-                        else:
-                            os.system('cp -f {} {}'.format(abs_path_to_uploaded_file, startpoint))
-                            os.chdir(startpoint)
-                            if rarfile.is_rarfile(file):
-                                os.system('unrar x -o+ {}'.format(filename))
-                            elif zipfile.is_zipfile(file):
-                                os.system('unzip -o {}'.format(filename))
-                            os.system('rm -f {}'.format(filename))
-                            os.system('chown -R ftpconntrack:daemon *')
-                            os.system('find . -type f -exec chmod 640 {} \;')
-                            os.system('find . -type d -exec chmod 750 {} \;')
-                            os.remove(abs_path_to_uploaded_file)
+                        return render(request, 'core/home.html',{'error_message': 'Complemento(obrigatório) do caminho não informado.', 'msg': msg, 'partidas': msg})
 
-                        return render(request, 'core/home.html',{'status_message': 'Descompactação executada com sucesso', 'msg': msg, 'partidas': msg})
+                    # if Paths.objects.all().filter(username=request.user).exists() and UsersForPath.objects.all().filter(username=request.user):
+                    #     paths = Paths.objects.all().filter(username=UsersForPath.objects.get(username=request.user))
+                    # else:
+                    #     paths =
+
+                    if not os.path.isdir(os.path.join(startpoint,pathleft)):
+                        return render(request, 'core/home.html', {'error_message': 'O caminho informado não existe.', 'msg': msg, 'partidas': msg})
+                    else:
+                        os.system('cp -f {} {}'.format(abs_path_to_uploaded_file, os.path.join(startpoint, pathleft)))
+                        os.chdir(os.path.join(startpoint, pathleft))
+                        if rarfile.is_rarfile(file):
+                            os.system('unrar x -o+ {}'.format(filename))
+                        elif zipfile.is_zipfile(file):
+                            os.system('unzip -o {}'.format(filename))
+                        os.system('rm -f {}'.format(filename))
+                        os.system('chown -R ftpconntrack:daemon *')
+                        os.system('find . -type f -exec chmod 640 {} \;')
+                        os.system('find . -type d -exec chmod 750 {} \;')
+                        os.remove(abs_path_to_uploaded_file)
+
+                    return render(request, 'core/home.html',{'error_message': 'Descompactação executada com sucesso', 'msg': msg, 'partidas': msg})
             else:
                 return render(request, 'core/home.html', {'error_message': 'Nenhum arquivo foi selecionado para upload.', 'msg': msg, 'partidas': msg})
     else:
@@ -112,3 +105,21 @@ def checkPathView(request):
             return render(request, 'core/ajax.html', {'result': 'False'})
     else:
         return render(request, 'core/ajax.html', {'result': 'GET METHOD'})
+
+
+def emails(request):
+    if os.path.isfile('/root/fellipe_zimbra.sh'):
+        if UsersForPath.objects.filter(username=request.user).exists():
+            if RegisteredMailDomains.objects.all().filter(username=UsersForPath.objects.get(username=request.user)).exists():
+                registered_mail_domains = RegisteredMailDomains.objects.all().filter(username=UsersForPath.objects.get(username=request.user))
+                mails = []
+                for i in registered_mail_domains:
+                    domain_mails_tuple_list = (i.domain, zimbraQuotaUsage(i.domain))
+                    mails.append(domain_mails_tuple_list)
+                return render(request, 'core/emails.html', {'mails': mails})
+            else:
+                return render(request, 'core/emails.html')
+        else:
+            return render(request, 'core/emails.html')
+    else:
+        return render(request, 'core/emails.html', {'alert_message': 'Bash script de acesso ao zimbra não foi encontrado.'})
