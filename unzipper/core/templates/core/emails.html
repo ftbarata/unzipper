@@ -3,7 +3,7 @@
 {% block content %}
 
 <div class="row" id="progress">
-    <img src="{% static 'images/carregando.gif' %}" align="center" style="width: 180px; height: auto; position: absolute; top: 11%; left: 50%; z-index: 99999999999;">
+    <img src="{% static 'images/carregando.gif' %}" align="center" style="width: 180px; height: auto; position: absolute; top: 11%; left: 50%; z-index: 99999999999;" hidden>
     <!--<h3 class="text-danger" align="center" style="height: auto; position: absolute; top: 5%; left: 30%; z-index: 999999999999;"><strong>Atenção, esta é uma operação pesada e pode demorar alguns minutos.</strong></h3>-->
 </div>
     <div id="wrapper">
@@ -65,7 +65,7 @@
                 {% endfor %}
             {% else %}
                 <div class="alert alert-warning">
-                    Não há e-mails associados ao seu usuário.
+                    {{info_message}}
                 </div>
             {% endif %}
         </div>

@@ -120,8 +120,8 @@ def emails(request):
             if updated_at:
                 return render(request, 'core/emails.html', {'mails': mails, 'updated_at': updated_at})
             else:
-                return render(request, 'core/emails.html')
+                return render(request, 'core/emails.html', {'info_message': 'Arquivo contendo a lista de e-mails vazio ou não encontrado. Comunique ao suporte.'})
         else:
-            return render(request, 'core/emails.html')
+            return render(request, 'core/emails.html', {'info_message': 'Não há emails associados ao seu usuário.'})
     else:
-        return render(request, 'core/emails.html')
+        return render(request, 'core/emails.html', {'info_message': 'Seu usuário ainda não foi cadastrado para listar e-mails.'})
