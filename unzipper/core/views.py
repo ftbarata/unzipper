@@ -117,7 +117,10 @@ def emails(request):
                 domain_mails_tuple_list = (i.domain, zimbraQuotaUsage(i.domain)[0])
                 mails.append(domain_mails_tuple_list)
                 updated_at = zimbraQuotaUsage(i.domain)[1]
-            return render(request, 'core/emails.html', {'mails': mails, 'updated_at': updated_at})
+            if updated_at:
+                return render(request, 'core/emails.html', {'mails': mails, 'updated_at': updated_at})
+            else:
+                return render(request, 'core/emails.html')
         else:
             return render(request, 'core/emails.html')
     else:
