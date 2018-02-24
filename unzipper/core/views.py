@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from .helper_functions import _login, _logout
 from django.core.files.storage import FileSystemStorage
-import rarfile, zipfile,os
+import rarfile, zipfile
 from .helper_functions import checkPath, checkPartidas, zimbraQuotaUsage
 from django.views.decorators.csrf import csrf_exempt
 from .models import Paths, UsersForPath, RegisteredMailDomains
@@ -119,11 +119,14 @@ def emails(request):
                     domain_mails_tuple_list = (i.domain, zimbraQuotaUsage(i.domain)[0])
                     mails.append(domain_mails_tuple_list)
                     updated_at = zimbraQuotaUsage(i.domain)[1]
+                    if updated_at:
+                        return render(request, 'core/emails.html', {'mails': mails, 'updated_at': updated_at})
+                    else:
+                        return render(request, 'core/emails.html', {'info_message': 'Arquivo contendo a lista de e-mails vazio ou não encontrado. Comunique ao suporte.'})
+
                 return render(request, 'core/emails.html', {'mails': mails, 'updated_at': updated_at, 'can_change_password': can_change_password})
             else:
-                return render(request, 'core/emails.html')
-        else:
-            return render(request, 'core/emails.html')
+                return render(request, 'core/emails.html', {'info_message': 'Não há emails associados ao seu usuário.'})
     else:
         return redirect('login')
 
