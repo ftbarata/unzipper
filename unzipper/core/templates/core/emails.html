@@ -49,13 +49,16 @@
                                                     <td class="center">{{j.0}}</td>
                                                     <td class="center">{{j.1|upper}}</td>
                                                     <td class="center">{{j.2}}</td>
+                                                {% if can_change_password %}
+                                                    <td class="center"><a class="btn btn-warning center" href="{% url 'change-mail-password' j.0 %}">Alterar senha</a></td>
+                                                {% endif %}
                                             {% else %}
                                                     <td class="center">{{j.0}}</td>
                                                     <td class="center">Ilimitado</td>
                                                     <td class="center">{{j.1}}</td>
                                                 {% if can_change_password %}
                                                     <td class="center"><a class="btn btn-warning center" href="{% url 'change-mail-password' j.0 %}">Alterar senha</a></td>
-                                            {% endif %}
+                                                {% endif %}
                                             {% endif %}
                                             </tr>
                                         {% endfor %}

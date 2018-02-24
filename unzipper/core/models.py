@@ -3,7 +3,9 @@ from django.db import models
 
 class UsersForPath(models.Model):
     username = models.CharField(verbose_name='Usuário', max_length=100)
+    can_list_emails = models.BooleanField(verbose_name='Pode listar emails', default=False)
     can_change_password = models.BooleanField(verbose_name='Pode alterar a senha', default=False)
+    can_upload = models.BooleanField(verbose_name='Pode fazer upload de arquivos', default=False)
 
     class Meta:
         verbose_name = 'Usuários para caminhos'

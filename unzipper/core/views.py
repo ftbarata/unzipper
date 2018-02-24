@@ -11,11 +11,19 @@ import os, subprocess
 
 def home(request):
     if request.user.is_authenticated:
+        can_upload_file = ''
+        can_list_emails = ''
+        if UsersForPath.objects.filter(username=request.user).exists():
+            can_upload_file = UsersForPath.objects.get(username=request.user).can_upload
+            can_list_emails = UsersForPath.objects.get(username=request.user).can_list_emails
         if request.method == 'GET':
+            if not can_upload_file:
+                return render(request, 'core/home.html',{'msg': 'Nenhum ponto de partida autorizado.', 'can_list_emails': can_list_emails,'can_upload_file': can_upload_file, 'error_message': 'Sem permissão para a página de upload.'})
+
             if checkPartidas(request):
-                return render(request, 'core/home.html', {'partidas':checkPartidas(request)})
+                return render(request, 'core/home.html', {'partidas':checkPartidas(request), 'can_list_emails':can_list_emails, 'can_upload_file': can_upload_file})
             else:
-                return render(request, 'core/home.html', {'msg': 'Nenhum ponto de partida autorizado.'})
+                return render(request, 'core/home.html', {'msg': 'Nenhum ponto de partida autorizado.', 'can_list_emails':can_list_emails, 'can_upload_file': can_upload_file})
         elif request.method == 'POST':
             if checkPartidas(request):
                 msg = checkPartidas(request)
@@ -23,7 +31,7 @@ def home(request):
                 msg = 'Nenhum ponto de partida autorizado.'
 
             if not checkPath(request.user, request.POST['pathname']):
-                return render(request, 'core/home.html',{'error_message': 'Sem permissão para o ponto de partida.', 'msg': msg, 'partidas': msg})
+                return render(request, 'core/home.html',{'error_message': 'Sem permissão para o ponto de partida.', 'msg': msg, 'partidas': msg, 'can_list_emails':can_list_emails, 'can_upload_file': can_upload_file})
 
             if request.FILES:
                 file = request.FILES['file']
@@ -35,7 +43,7 @@ def home(request):
 
                 if not rarfile.is_rarfile(file) and not zipfile.is_zipfile(file):
                     os.remove(os.path.join(fs.location, filename))
-                    return render(request, 'core/home.html',{'error_message': 'Arquivo não é zip nem rar.', 'msg': msg, 'partidas': msg})
+                    return render(request, 'core/home.html',{'error_message': 'Arquivo não é zip nem rar.', 'msg': msg, 'partidas': msg, 'can_list_emails':can_list_emails, 'can_upload_file': can_upload_file})
                 else:
                     startpoint = request.POST['pathname']
 
@@ -44,7 +52,7 @@ def home(request):
                     if 'pathnameleft' in request.POST:
                         pathleft = request.POST['pathnameleft']
                     else:
-                        return render(request, 'core/home.html',{'error_message': 'Complemento(obrigatório) do caminho não informado.', 'msg': msg, 'partidas': msg})
+                        return render(request, 'core/home.html',{'error_message': 'Complemento(obrigatório) do caminho não informado.', 'msg': msg, 'partidas': msg, 'can_list_emails':can_list_emails, 'can_upload_file': can_upload_file})
 
                     # if Paths.objects.all().filter(username=request.user).exists() and UsersForPath.objects.all().filter(username=request.user):
                     #     paths = Paths.objects.all().filter(username=UsersForPath.objects.get(username=request.user))
@@ -52,7 +60,7 @@ def home(request):
                     #     paths =
 
                     if not os.path.isdir(os.path.join(startpoint,pathleft)):
-                        return render(request, 'core/home.html', {'error_message': 'O caminho informado não existe.', 'msg': msg, 'partidas': msg})
+                        return render(request, 'core/home.html', {'error_message': 'O caminho informado não existe.', 'msg': msg, 'partidas': msg, 'can_list_emails':can_list_emails, 'can_upload_file': can_upload_file})
                     else:
                         os.system('cp -f {} {}'.format(abs_path_to_uploaded_file, os.path.join(startpoint, pathleft)))
                         os.chdir(os.path.join(startpoint, pathleft))
@@ -66,23 +74,29 @@ def home(request):
                         os.system('find . -type d -exec chmod 750 {} \;')
                         os.remove(abs_path_to_uploaded_file)
 
-                    return render(request, 'core/home.html',{'error_message': 'Descompactação executada com sucesso', 'msg': msg, 'partidas': msg})
+                    return render(request, 'core/home.html',{'error_message': 'Descompactação executada com sucesso', 'msg': msg, 'partidas': msg, 'can_list_emails':can_list_emails, 'can_upload_file': can_upload_file})
             else:
-                return render(request, 'core/home.html', {'error_message': 'Nenhum arquivo foi selecionado para upload.', 'msg': msg, 'partidas': msg})
+                return render(request, 'core/home.html', {'error_message': 'Nenhum arquivo foi selecionado para upload.', 'msg': msg, 'partidas': msg, 'can_list_emails':can_list_emails, 'can_upload_file': can_upload_file})
     else:
         return redirect('login')
 
 
 def login(request):
     if request.method == 'POST':
+        can_list_emails = ''
+        can_upload_file = ''
         if _login(request):
             if UsersForPath.objects.filter(username=request.user).exists():
+                can_upload_file = UsersForPath.objects.get(username=request.user).can_upload
+                can_list_emails = UsersForPath.objects.get(username=request.user).can_list_emails
                 partidas = Paths.objects.filter(username=UsersForPath.objects.get(username=request.user))
+                if not can_upload_file:
+                    return render(request, 'core/home.html',{'msg': 'Nenhum ponto de partida autorizado.', 'can_list_emails': can_list_emails,'can_upload_file': can_upload_file,'error_message': 'Sem permissão para a página de upload.'})
                 if partidas:
-                    return render(request, 'core/home.html', {'partidas':partidas})
+                    return render(request, 'core/home.html', {'partidas':partidas, 'can_list_emails':can_list_emails, 'can_upload_file': can_upload_file})
                 else:
-                    return render(request, 'core/home.html', {'msg': 'Nenhum ponto de partida autorizado.'})
-            return render(request, 'core/home.html', {'msg': 'Nenhum ponto de partida autorizado.'})
+                    return render(request, 'core/home.html', {'msg': 'Nenhum ponto de partida autorizado.', 'can_list_emails':can_list_emails, 'can_upload_file': can_upload_file })
+            return render(request, 'core/home.html', {'msg': 'Nenhum ponto de partida autorizado.', 'can_list_emails':can_list_emails, 'can_upload_file': can_upload_file})
         else:
             context = {'error_message': 'Acesso negado. Verifique seu login e senha.'}
             return render(request, 'core/login.html', context)
@@ -109,8 +123,13 @@ def checkPathView(request):
 
 def emails(request):
     if request.user.is_authenticated:
+        can_list_emails = ''
+        can_upload_file = ''
         if UsersForPath.objects.filter(username=request.user).exists():
             can_change_password = UsersForPath.objects.get(username=request.user).can_change_password
+            can_upload_file = UsersForPath.objects.get(username=request.user).can_upload
+            can_list_emails = UsersForPath.objects.get(username=request.user).can_list_emails
+
             if RegisteredMailDomains.objects.all().filter(username=UsersForPath.objects.get(username=request.user)).exists():
                 registered_mail_domains = RegisteredMailDomains.objects.all().filter(username=UsersForPath.objects.get(username=request.user))
                 mails = []
@@ -119,14 +138,14 @@ def emails(request):
                     domain_mails_tuple_list = (i.domain, zimbraQuotaUsage(i.domain)[0])
                     mails.append(domain_mails_tuple_list)
                     updated_at = zimbraQuotaUsage(i.domain)[1]
-                    if updated_at:
-                        return render(request, 'core/emails.html', {'mails': mails, 'updated_at': updated_at})
-                    else:
-                        return render(request, 'core/emails.html', {'info_message': 'Arquivo contendo a lista de e-mails vazio ou não encontrado. Comunique ao suporte.'})
-
-                return render(request, 'core/emails.html', {'mails': mails, 'updated_at': updated_at, 'can_change_password': can_change_password})
+                if updated_at:
+                    return render(request, 'core/emails.html', {'mails': mails, 'updated_at': updated_at, 'can_change_password': can_change_password, 'can_list_emails':can_list_emails, 'can_upload_file': can_upload_file})
+                else:
+                    return render(request, 'core/emails.html', {'info_message': 'Arquivo contendo a lista de e-mails vazio ou não encontrado. Comunique ao suporte.', 'can_list_emails':can_list_emails, 'can_upload_file': can_upload_file})
             else:
-                return render(request, 'core/emails.html', {'info_message': 'Não há emails associados ao seu usuário.'})
+                return render(request, 'core/emails.html', {'info_message': 'Não há emails associados ao seu usuário.', 'can_list_emails':can_list_emails, 'can_upload_file': can_upload_file})
+        else:
+            return render(request, 'core/emails.html', {'info_message': 'Você possui apenas login. Falta configurar seu usuário. Contacte-o suporte.', 'can_list_emails':can_list_emails, 'can_upload_file': can_upload_file})
     else:
         return redirect('login')
 

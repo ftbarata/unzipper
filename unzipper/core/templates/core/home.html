@@ -3,13 +3,14 @@
 {% block content %}
 
 <div id="page-wrapper">
+    {% if can_upload_file %}
     <div class="panel-body">
         <div class="row">
             <h3 class="text-primary">Descompactar arquivo</h3>
         </div>
     </div>
     <div class="row" id="progress">
-        <img src="{% static 'images/carregando.gif' %}" align="center" style="width: 180px; height: auto; position: absolute; top: 11%; left: 50%; z-index: 99999999999;" hidden>
+        <img src="{% static 'images/carregando.gif' %}" align="center" style="width: 180px; height: auto; position: absolute; top: 11%; left: 50%; z-index: 99999999999;">
         <!--<h3 class="text-danger" align="center" style="height: auto; position: absolute; top: 5%; left: 30%; z-index: 999999999999;"><strong>Atenção, esta é uma operação pesada e pode demorar alguns minutos.</strong></h3>-->
     </div>
     <form  enctype="multipart/form-data" method="post" id="uploadform" action="{% url 'home' %}">
@@ -72,6 +73,7 @@
             </tbody>
         </table>
     </div>
+    {% endif %}
 </div>
 
 {% endblock %}
