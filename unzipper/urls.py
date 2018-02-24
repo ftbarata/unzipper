@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from .core.views import home, login, logout, checkPathView, emails
+from .core.views import home, login, logout, checkPathView, emails, changeMailPassword, changeMailPasswordFromForm
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -27,6 +27,8 @@ urlpatterns = [
     path('login/', login, name='login'),
     path('logout/', logout, name='logout'),
     path('ajax/checkpath', checkPathView, name='ajax'),
+    path('change-mail-password/<str:email>', changeMailPassword, name='change-mail-password'),
+    path('change-mail-password-from-form', changeMailPasswordFromForm, name='change-mail-password-from-form')
 ]
 
 

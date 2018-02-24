@@ -37,20 +37,26 @@
                                                 <th>Conta</th>
                                                 <th>Cota Total</th>
                                                 <th>Cota Utilizada</th>
+                                            {% if can_change_password %}
+                                                <th>Alteração de senha</th>
+                                            {% endif %}
                                             </tr>
                                         </thead>
                                         <tbody>
                                         {% for j in i.1 %}
                                             <tr class="info">
-                                                {% if j.2 %}
+                                            {% if j.2 %}
                                                     <td class="center">{{j.0}}</td>
                                                     <td class="center">{{j.1|upper}}</td>
                                                     <td class="center">{{j.2}}</td>
-                                                {% else %}
+                                            {% else %}
                                                     <td class="center">{{j.0}}</td>
                                                     <td class="center">Ilimitado</td>
                                                     <td class="center">{{j.1}}</td>
-                                                {% endif %}
+                                                {% if can_change_password %}
+                                                    <td class="center"><a class="btn btn-warning center" href="{% url 'change-mail-password' j.0 %}">Alterar senha</a></td>
+                                            {% endif %}
+                                            {% endif %}
                                             </tr>
                                         {% endfor %}
                                         </tbody>

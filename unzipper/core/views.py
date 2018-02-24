@@ -6,7 +6,7 @@ from .helper_functions import checkPath, checkPartidas, zimbraQuotaUsage
 from django.views.decorators.csrf import csrf_exempt
 from .models import Paths, UsersForPath, RegisteredMailDomains
 from django.conf import settings
-import os
+import os, subprocess
 
 
 def home(request):
@@ -108,17 +108,51 @@ def checkPathView(request):
 
 
 def emails(request):
-    if UsersForPath.objects.filter(username=request.user).exists():
-        if RegisteredMailDomains.objects.all().filter(username=UsersForPath.objects.get(username=request.user)).exists():
-            registered_mail_domains = RegisteredMailDomains.objects.all().filter(username=UsersForPath.objects.get(username=request.user))
-            mails = []
-            updated_at = ''
-            for i in registered_mail_domains:
-                domain_mails_tuple_list = (i.domain, zimbraQuotaUsage(i.domain)[0])
-                mails.append(domain_mails_tuple_list)
-                updated_at = zimbraQuotaUsage(i.domain)[1]
-            return render(request, 'core/emails.html', {'mails': mails, 'updated_at': updated_at})
+    if request.user.is_authenticated:
+        if UsersForPath.objects.filter(username=request.user).exists():
+            can_change_password = UsersForPath.objects.get(username=request.user).can_change_password
+            if RegisteredMailDomains.objects.all().filter(username=UsersForPath.objects.get(username=request.user)).exists():
+                registered_mail_domains = RegisteredMailDomains.objects.all().filter(username=UsersForPath.objects.get(username=request.user))
+                mails = []
+                updated_at = ''
+                for i in registered_mail_domains:
+                    domain_mails_tuple_list = (i.domain, zimbraQuotaUsage(i.domain)[0])
+                    mails.append(domain_mails_tuple_list)
+                    updated_at = zimbraQuotaUsage(i.domain)[1]
+                return render(request, 'core/emails.html', {'mails': mails, 'updated_at': updated_at, 'can_change_password': can_change_password})
+            else:
+                return render(request, 'core/emails.html')
         else:
             return render(request, 'core/emails.html')
     else:
-        return render(request, 'core/emails.html')
+        return redirect('login')
+
+
+def changeMailPassword(request, email):
+    if request.user.is_authenticated:
+        if request.method == 'GET':
+            return render(request, 'core/change_mail_password.html', {'email': email})
+        else:
+            return render(request, 'core/change_mail_password.html', {'error_message': 'Método não foi GET.'})
+    else:
+        return redirect('login')
+
+
+def changeMailPasswordFromForm(request):
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            if request.POST['password']:
+                email = request.POST['email']
+                new_password = request.POST['password']
+                result = subprocess.run(['ssh', '-C', 'root@mx.manancialturismo.com.br', 'su - zimbra -c "zmprov sp {} {}"'.format(email,new_password)],stdout=subprocess.PIPE)
+                response = result.stdout.decode('utf-8')
+                if len(response) == 0:
+                    return render(request, 'core/change_mail_password.html', {'status_message':'Senha alterada com sucesso.', 'email': email})
+                else:
+                    return render(request, 'core/change_mail_password.html',{'error_message': 'Ocorreu um erro na operação. Contacte o suporte.', 'email': email})
+            else:
+                return render(request, 'core/change_mail_password.html',{'error_message': 'Senha não informada.'})
+        else:
+            return render(request, 'core/change_mail_password.html', {'error_message': 'Método não foi POST.'})
+    else:
+        return redirect('login')

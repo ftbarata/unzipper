@@ -49,7 +49,6 @@ def zimbraQuotaUsage(domain):
     tuples_list = []
     updated_at = ''
     for line in response:
-        print(line)
         if 'Conta' not in line and 'Cota_Total' not in line:
             if '/' in line:
                 updated_at = line

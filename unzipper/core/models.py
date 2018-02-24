@@ -3,6 +3,7 @@ from django.db import models
 
 class UsersForPath(models.Model):
     username = models.CharField(verbose_name='Usuário', max_length=100)
+    can_change_password = models.BooleanField(verbose_name='Pode alterar a senha', default=False)
 
     class Meta:
         verbose_name = 'Usuários para caminhos'

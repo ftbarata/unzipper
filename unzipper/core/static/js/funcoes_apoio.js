@@ -33,4 +33,12 @@ $("#emails_hyperlink").click(function() {
     $("#progress").show();
   });
 
+$("#salvar_senha").click(function() {
+    $("#progress").show();
+  });
+
+$("#voltar").click(function() {
+    $("#progress").show();
+});
+
 });
