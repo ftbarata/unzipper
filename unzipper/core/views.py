@@ -135,7 +135,7 @@ def emails(request):
                 mails = []
                 updated_at = ''
                 for i in registered_mail_domains:
-                    domain_mails_tuple_list = (i.domain, zimbraQuotaUsage(i.domain)[0])
+                    domain_mails_tuple_list = (i.domain, zimbraQuotaUsage(i.domain)[0], len(zimbraQuotaUsage(i.domain)[0]))
                     mails.append(domain_mails_tuple_list)
                     updated_at = zimbraQuotaUsage(i.domain)[1]
                 if updated_at:
